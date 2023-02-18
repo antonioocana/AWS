@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  mysql:
+    container_name: mi-mysql
+    image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: toor
+
+    volumes:
+      - mi-mysql-vol:/var/lib/mysql
+
+    networks:
+      mi-mysqlred:
+        ipv4_address: 172.25.0.2
+
+   
+  
+  phpmyadmin:
+    container_name: mi-dashboard
+    image: phpmyadmin:latest
+    restart: always
+    ports:
+      - 8080:80
+      
+    environment:
+      PMA_HOST: mi-mysql
+      MYSQL_ROOT_PASSWORD: toor
+
+    depends_on:
+      - mysql
+    networks:
+      mi-mysqlred:
+        ipv4_address: 172.25.0.3
+  
+networks:
+  mi-mysqlred:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+  
+volumes:
+  mi-mysql-vol:
+    driver: local
